@@ -72,6 +72,18 @@ async function run() {
         data: product,
       });
     });
+
+    // post product
+    app.post('/api/postProduct', async (req, res) => {
+      const product = req.body;
+
+      const result = await productCollection.insertOne(product);
+
+      res.status(200).json({
+        message: 'Product created successfully',
+        data: result,
+      });
+    });
   } catch (error) {
   } finally {
   }
