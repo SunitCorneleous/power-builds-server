@@ -21,12 +21,55 @@ async function run() {
   try {
     const productCollection = client.db('power-builds').collection('products');
 
+    // get all products
     app.get('/api/products', async (req, res) => {
       const products = await productCollection.find({}).toArray();
 
       res.status(200).json({
         message: 'Products retrieved successfully',
         data: products,
+      });
+    });
+
+    // get product by id
+    app.get('/api/productById', async (req, res) => {
+      const { productId } = req.query;
+
+      if (!productId || !ObjectId.isValid(productId)) {
+        return res.status(400).json({ error: 'Invalid product ID' });
+      }
+
+      const product = await productCollection.findOne({
+        _id: new ObjectId(productId),
+      });
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.status(200).json({
+        message: 'Product retrieved successfully',
+        data: product,
+      });
+    });
+
+    // get products by category
+    app.get('/api/productByCategory', async (req, res) => {
+      const { category } = req.query;
+
+      const product = await productCollection
+        .find({
+          category: category,
+        })
+        .toArray();
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.status(200).json({
+        message: 'Product retrieved successfully',
+        data: product,
       });
     });
   } catch (error) {
